@@ -1344,8 +1344,7 @@ SpamMessages[9] = "this is hell and we both know it"
 SpamMessages[10] = "hnghgngn your mom!!!"
 SpamMessages[11] = "why are you gae"
 SpamMessages[12] = "بعغباثهخنبانبغاضغخع عؤن ىثباقتباتباخنتبمضهاتبانبانثضت"
-SpamMessages[13] = "https://projectvalornew.wordpress.com/"
-SpamMessages[14] = "https://projectvalornew.wordpress.com/"
+SpamMessages[13] = "I picked on little kids dammit -Zrehondier"
 
 local function funnyspam()
 	if GetConVarNumber("ChatSpam") == 1 and GetConVarNumber("ChatSpam_DarkRP") == 1 then
