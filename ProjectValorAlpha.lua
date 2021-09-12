@@ -1,4 +1,134 @@
 
+CreateClientConVar("_pkill_speed", 100)
+CreateClientConVar("_pkill_prop", "models/props_c17/furnitureStove001a.mdl")
+CreateClientConVar("_pkill_remover", 0.9)
+CreateClientConVar("_weap_lagcomp", 0.1)
+
+surface.CreateFont("pcam_font",{font = "Arial", size = 40, weight = 100000, antialias = 0})
+function DrawOutlinedText ( title, font, x, y, color, OUTsize, OUTcolor )
+	draw.SimpleTextOutlined ( title, font, x, y, color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, OUTsize, OUTcolor )
+end
+
+local function propkill()
+
+	local atttime = GetConVarNumber("_weap_lagcomp")
+	 if LocalPlayer():GetActiveWeapon():GetClass() != "weapon_physgun" then
+		local lastwep = LocalPlayer():GetActiveWeapon()
+		RunConsoleCommand("use", "weapon_physgun")
+		atttime = 0.2
+		timer.Simple(atttime+.3, function()
+		RunConsoleCommand("use", lastwep:GetClass())
+             end)
+
+        end
+	hook.Add( "CreateMove", "PKill", function(cmd)
+		cmd:SetMouseWheel(GetConVarNumber("_pkill_speed"))
+	end)
+	RunConsoleCommand("gm_spawn", GetConVarString("_pkill_prop"))
+	timer.Simple(atttime, function()
+		RunConsoleCommand("+attack")
+	end)
+	
+	timer.Simple(atttime+0.1, function()
+		RunConsoleCommand("-attack")
+	end)
+	timer.Simple(atttime+GetConVarNumber("_pkill_remover"), function()
+		hook.Remove("CreateMove", "PKill")
+		RunConsoleCommand("undo")
+	end )
+end
+concommand.Add("_pkill", propkill)
+
+CreateClientConVar("lenny_fullbright", 0)
+CreateClientConVar("lenny_fullbright_models", 1)
+CreateClientConVar("lenny_fullbright_extend", 1)
+local lightmodels = GetConVarNumber("lenny_fullbright_models")
+local extend = GetConVarNumber("lenny_fullbright_extend")
+
+local light = DynamicLight(LocalPlayer():EntIndex())
+local light2 = DynamicLight(LocalPlayer():EntIndex() + 1)
+
+
+
+local function fullbright()
+	if light then
+		local r, g, b = 255, 255, 255
+		light.Pos = LocalPlayer():GetShootPos()
+		light.Brightness = 0.5
+		light.MinLight = 0.5    
+		light.Size = 2048
+		light.Decay = 1
+		light.DieTime = CurTime() + 1
+		light.Style = 0
+		light.r = r
+		light.g = g
+		light.b = b
+		light.NoModel = lightmodels == 0 and true or false
+		light.NoWorld = false
+	else
+		light = DynamicLight(LocalPlayer():EntIndex())
+	end
+	if light2 then
+		if extend == 1 then
+			local r, g, b = 255, 255, 255
+			light2.Pos = LocalPlayer():GetEyeTrace().HitPos
+			light2.Brightness = 0.5
+			light2.MinLight = 0.5
+			light2.Size = 2048
+			light2.Decay = 1
+			light2.DieTime = CurTime() + 1
+			light2.Style = 0
+			light2.r = r
+			light2.g = g
+			light2.b = b
+			light2.NoModel = lightmodels == 0 and true or false
+			light2.NoWorld = false
+		else
+			light2.NoModel = true
+			light2.NoWorld = true
+		end
+	else
+		light2 = DynamicLight(LocalPlayer():EntIndex() + 1)
+	end
+end
+local function callback()
+	local enabled = GetConVarNumber("lenny_fullbright")
+	if enabled == 1 then
+		hook.Add("Think", "fullbright", fullbright)
+	else
+		light2.NoModel = true
+		light2.NoWorld = true
+		light.NoModel = true
+		light.NoWorld = true
+		hook.Remove("Think", "fullbright")
+	end
+end
+callback()
+cvars.AddChangeCallback("lenny_fullbright", callback)
+cvars.AddChangeCallback("lenny_fullbright_models", function()
+	lightmodels = GetConVarNumber("lenny_fullbright_models")
+end)
+cvars.AddChangeCallback("lenny_fullbright_extend", function()
+	extend = GetConVarNumber("lenny_fullbright_extend")
+end)
+
+local function profile()
+
+local frame = vgui.Create( "DFrame" )
+frame:SetSize( ScrW() * 0.5, ScrH() * 0.5 )
+frame:SetTitle( "Astroux's Profile" )
+frame:Center()
+frame:MakePopup()
+
+local html = vgui.Create( "DHTML", frame )
+html:Dock( FILL )
+html:OpenURL( "https://steamcommunity.com/profiles/76561198159948937" )
+frame.Paint = function( self, w, h )
+	draw.RoundedBox( 0, 0, 0, w, h, Color( 1, 1, 1, 50 ) ) -- Draw a blue button
+   end
+end
+
+
 local ChamMaterials = {
 	["Platinum"] = "models/player/shared/ice_player",
 	["Gold"] = "models/player/shared/gold_player",
@@ -1050,7 +1180,6 @@ local Thirdperson = function(ply, origin, angles, fov)
 
 	return view
 end
-
 hook.Add("CalcView", "Thirdperson", Thirdperson)
 
 CreateClientConVar("cheat_fov", "110", true, false)
@@ -1134,87 +1263,6 @@ local function rapidfire(cmd)
 		end
 	end
 end
-
-    freecamAngles = Angle()
-    freecamAngles2 = Angle()
-    freecamPos = Vector()
-    freecamEnabled = false
-    freecamSpeed = 3
-    keyPressed = false
-     
-    hook.Add("CreateMove", "lock_movement", function(ucmd)
-        if(freecamEnabled) then
-            ucmd:SetSideMove(0)
-            ucmd:SetForwardMove(0)
-            ucmd:SetViewAngles(freecamAngles2)
-            ucmd:RemoveKey(IN_JUMP)
-            ucmd:RemoveKey(IN_DUCK)
-            
-            freecamAngles = (freecamAngles + Angle(ucmd:GetMouseY() * .023, ucmd:GetMouseX() * -.023, 0));
-            freecamAngles.p, freecamAngles.y, freecamAngles.x = math.Clamp(freecamAngles.p, -89, 89), math.NormalizeAngle(freecamAngles.y), math.NormalizeAngle(freecamAngles.x);
-     
-            local curFreecamSpeed = freecamSpeed
-            if(input.IsKeyDown(KEY_LSHIFT)) then
-                curFreecamSpeed = freecamSpeed * 2
-            end
-     
-            if(input.IsKeyDown(KEY_W)) then
-                freecamPos = freecamPos + (freecamAngles:Forward() * curFreecamSpeed)
-            end
-            if(input.IsKeyDown(KEY_S)) then
-                freecamPos = freecamPos - (freecamAngles:Forward() * curFreecamSpeed)
-            end
-            if(input.IsKeyDown(KEY_A)) then
-                freecamPos = freecamPos - (freecamAngles:Right() * curFreecamSpeed)
-            end
-            if(input.IsKeyDown(KEY_D)) then
-                freecamPos = freecamPos + (freecamAngles:Right() * curFreecamSpeed)
-            end
-            if(input.IsKeyDown(KEY_SPACE)) then
-                freecamPos = freecamPos + Vector(0,0,curFreecamSpeed)
-            end
-            if(input.IsKeyDown(KEY_LCONTROL)) then
-                freecamPos = freecamPos - Vector(0,0,curFreecamSpeed)
-            end
-        end
-    end)
-     
-    hook.Add("Tick", "checkKeybind", function()
-     if GetConVarNumber("EZ_Freecam") == 1 then
-        if(input.IsKeyDown(KEY_LALT)) then
-            if(!keyPressed) then
-                freecamEnabled = !freecamEnabled
-                freecamAngles = LocalPlayer():EyeAngles()
-                freecamAngles2 = LocalPlayer():EyeAngles()
-                freecamPos = LocalPlayer():EyePos()
-                keyPressed = true
-            end
-        else
-            keyPressed = false
-         end
-      end
-   end)
-
-    hook.Add("CalcView", "freeCam", function(ply, pos, angles, fov)
-        local view = {}
-        if(freecamEnabled) then
-            view = {
-                origin = freecamPos,
-                angles = freecamAngles,
-                fov = fov,
-                drawviewer = true
-            }
-        else
-            view = {
-                origin = pos,
-                angles = angles,
-                fov = fov,
-                drawviewer = false
-            }
-        end
-     
-    	return view
-    end)
 
 surface.CreateFont( "HUGETextForHUD", {
 	font = "trebuchet18",
@@ -1300,6 +1348,7 @@ end)
 
 
 
+CreateClientConVar ("EZ_killsay","1", true ,false )
 
 CreateClientConVar ("E_watermarkezhack","1", true ,false )
     hook.Add("HUDPaint", "watermark",function() 
@@ -1356,18 +1405,38 @@ end
 
 timer.Create("chatspamtimer", 6, 0, funnyspam)
 
+local ply = LocalPlayer()
+
+Spam2Messages = {}
+Spam2Messages[1] = "That Must Sting."
+Spam2Messages[2] = "Ohhh Yikes You Got Messed Up"
+Spam2Messages[3] = "just leave already"
+
     gameevent.Listen("player_hurt")
 
     local function hitSound(data)
      if GetConVarNumber("hitsound") == 1 then
     	local ply = LocalPlayer()
     	if data.attacker == ply:UserID() then
-    		surface.PlaySound("buttons/button17.wav") // name of a sound that exists in gmod
+                surface.PlaySound("buttons/button17.wav")
        end
     end
  end
      
     hook.Add("player_hurt", "", hitSound)
+
+    gameevent.Listen("player_hurt")
+
+    local function killsay(data)
+     if GetConVarNumber("EZ_killsay") == 1 then
+    	local ply = LocalPlayer()
+    	if data.attacker == ply:UserID() then
+    		ply:ConCommand("say "..table.Random(Spam2Messages).." " )
+       end
+    end
+ end
+     
+    hook.Add("player_hurt", "", killsay)
 
 CategoryList3 = vgui.Create( "DPanelList" )                                      
 CategoryList3:SetSpacing( 5 )
@@ -1435,11 +1504,11 @@ surface.PlaySound ("buttons/button14.wav")
  panel4.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
  sheet:AddSheet( "Chat", panel4 )
 
- --local panel5 = vgui.Create( "DPanel", sheet )
--- panel5:SetText( "About" )
- --panel5:Dock( FILL )
--- panel5.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
- --sheet:AddSheet( "Manual Configing", panel5 )
+ local panel5 = vgui.Create( "DPanel", sheet )
+ panel5:SetText( "About" )
+ panel5:Dock( FILL )
+ panel5.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
+ sheet:AddSheet( "About", panel5 )
   
  local SheetItemOne = vgui.Create( "DCheckBoxLabel", panel1)
  SheetItemOne:SetText( "Legit Aimbot (PLAYER ONLY)" )
@@ -1473,6 +1542,12 @@ surface.PlaySound ("buttons/button14.wav")
  SheetItemOne2345:SetConVar( "lenny_rapidfire" )
  SheetItemOne2345:SetPos( 4, 60 )	
  SheetItemOne2345:SizeToContents()
+
+ local SheetItemOne23454 = vgui.Create( "DCheckBoxLabel", panel1)
+ SheetItemOne23454:SetText( "TFA Norecoil (BUGGY)" )
+ SheetItemOne23454:SetConVar( "EZ_Norecoil" )
+ SheetItemOne23454:SetPos( 4, 80 )	
+ SheetItemOne23454:SizeToContents()
 
   
 local SheetItemTwo = vgui.Create( "DCheckBoxLabel" , panel2 )
@@ -1517,13 +1592,6 @@ SheetItemTwo3445:SetPos( 4, 100 )
 SheetItemTwo3445:SetSize( 75, 15 )	
 SheetItemTwo3445:SizeToContents()
 
-local SheetItemTwo34455 = vgui.Create( "DCheckBoxLabel" , panel2 )
-SheetItemTwo34455:SetText( "Freecam (LEFT ALT) (SCREENGRABBABLE)" )
-SheetItemTwo34455:SetConVar( "EZ_Freecam" )
-SheetItemTwo34455:SetPos( 4, 120 )
-SheetItemTwo34455:SetSize( 75, 15 )	
-SheetItemTwo34455:SizeToContents()
-
 local SheetItemTwo344556 = vgui.Create( "DCheckBoxLabel" , panel2 )
 SheetItemTwo344556:SetText( "Thirdperson (SCREENGRABBABLE)" )
 SheetItemTwo344556:SetConVar( "tp" )
@@ -1534,23 +1602,30 @@ SheetItemTwo344556:SizeToContents()
 local SheetItemTwo3445563 = vgui.Create( "DCheckBoxLabel" , panel2 )
 SheetItemTwo3445563:SetText( "Custom FOV (SCREENGRABBABLE)" )
 SheetItemTwo3445563:SetConVar( "EZ_customfov" )
-SheetItemTwo3445563:SetPos( 4, 160 )
+SheetItemTwo3445563:SetPos( 4, 120 )
 SheetItemTwo3445563:SetSize( 75, 15 )	
 SheetItemTwo3445563:SizeToContents()
 
 local SheetItemTwo3445563 = vgui.Create( "DCheckBoxLabel" , panel2 )
 SheetItemTwo3445563:SetText( "Hand Chams (SCREENGRABBABLE)" )
 SheetItemTwo3445563:SetConVar( "EZ_Handchams" )
-SheetItemTwo3445563:SetPos( 250, 0 )
+SheetItemTwo3445563:SetPos( 4, 160 )
 SheetItemTwo3445563:SetSize( 75, 15 )	
 SheetItemTwo3445563:SizeToContents()
 
 local SheetItemTwo34455635 = vgui.Create( "DCheckBoxLabel" , panel2 )
 SheetItemTwo34455635:SetText( "Viewmodel Chams (SCREENGRABBABLE)" )
 SheetItemTwo34455635:SetConVar( "EZ_Viewmodelchams" )
-SheetItemTwo34455635:SetPos( 250, 20 )
+SheetItemTwo34455635:SetPos( 250, 0 )
 SheetItemTwo34455635:SetSize( 75, 15 )	
 SheetItemTwo34455635:SizeToContents()
+
+local SheetItemTwo344556345 = vgui.Create( "DCheckBoxLabel" , panel2 )
+SheetItemTwo344556345:SetText( "Fullbright (SCREENGRABBABLE)" )
+SheetItemTwo344556345:SetConVar( "lenny_fullbright" )
+SheetItemTwo344556345:SetPos( 250, 20 )
+SheetItemTwo344556345:SetSize( 75, 15 )	
+SheetItemTwo344556345:SizeToContents()
 
 local SheetItemTwo3445563 = vgui.Create( "DCheckBoxLabel" , panel3 )
 SheetItemTwo3445563:SetText( "Chat Spammer" )
@@ -1603,6 +1678,13 @@ SheetItemTwo3445563:SizeToContents()
 	Misccheat6:SizeToContents()
         local Misccheat7 = vgui.Create( "DCheckBoxLabel", panel3 )
         Misccheat7:SetPos( 4, 140 )
+
+        local Misccheat66 = vgui.Create( "DCheckBoxLabel", panel3 )
+        Misccheat66:SetPos( 250, 120 )
+
+        Misccheat66:SetText( "HurtSay/Killsay" )
+	Misccheat66:SetConVar( "EZ_killsay" )
+	Misccheat66:SizeToContents()
 	
 	Misccheat7:SetText( "Reconnect On Low Health (25 HP)" )
 	Misccheat7:SetConVar( "lowhealthretry" )
@@ -1643,6 +1725,24 @@ SheetItemTwo3445563:SizeToContents()
     CategoryContentSixa23:SetDecimals( 0 )
     CategoryContentSixa23:SetConVar( "cheat_fov" )
 
+        local CategoryContentSixa234 = vgui.Create( "DNumSlider", panel3 )
+    CategoryContentSixa234:SetSize( 150, 60 ) -- Keep the second number at 50
+    CategoryContentSixa234:SetText( "Propkill Remove Timer" )
+    CategoryContentSixa234:SetPos( 250, 60 )
+    CategoryContentSixa234:SetMin( 1 )
+    CategoryContentSixa234:SetMax( 10 )
+    CategoryContentSixa234:SetDecimals( 0 )
+    CategoryContentSixa234:SetConVar( "_pkill_remover" )
+
+            local CategoryContentSixa233 = vgui.Create( "DNumSlider", panel3 )
+    CategoryContentSixa233:SetSize( 150, 60 ) -- Keep the second number at 50
+    CategoryContentSixa233:SetText( "Propkill Speed" )
+    CategoryContentSixa233:SetPos( 250, 30 )
+    CategoryContentSixa233:SetMin( 100 )
+    CategoryContentSixa233:SetMax( 2000 )
+    CategoryContentSixa233:SetDecimals( 0 )
+    CategoryContentSixa233:SetConVar( "_pkill_speed" )
+
     local CategoryContentSixa232 = vgui.Create( "DNumSlider", panel2 )
     CategoryContentSixa232:SetSize( 150, 60 ) -- Keep the second number at 50
     CategoryContentSixa232:SetText( "Box ESP Radius" )
@@ -1651,7 +1751,39 @@ SheetItemTwo3445563:SizeToContents()
     CategoryContentSixa232:SetMax( 10000 )
     CategoryContentSixa232:SetDecimals( 0 )
     CategoryContentSixa232:SetConVar( "lenny_esp_radius" )
+
+    local DermaButton2 = vgui.Create( "DButton", panel3 ) // Create the button and parent it to the frame
+DermaButton2:SetText( "Propkill Help" )					// Set the text on the button
+DermaButton2:SetPos( 250, 0 )					// Set the position on the frame
+DermaButton2:SetSize( 150, 30 )				// Set the size
+DermaButton2.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
+DermaButton2.DoClick = function() Derma_Message(" bind <key> _pkill ", "How To Use Propkill", "OK") end	// A custom function run when clicked ( note the . instead of : )
+
+    local DermaButton22 = vgui.Create( "DButton", panel5 ) // Create the button and parent it to the frame
+DermaButton22:SetText( "About Project Valor" )					// Set the text on the button
+DermaButton22:SetPos( 0, 0 )					// Set the position on the frame
+DermaButton22:SetSize( 150, 30 )				// Set the size
+DermaButton22.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
+DermaButton22.DoClick = function() Derma_Message("Project Valor\n\nBy Astroux.", "About Project Valor", "OK") end	// A custom function run when clicked ( note the . instead of : )
+
+    local DermaButton223 = vgui.Create( "DButton", panel5 ) // Create the button and parent it to the frame
+DermaButton223:SetText( "Changelog" )					// Set the text on the button
+DermaButton223:SetPos( 130, 0 )					// Set the position on the frame
+DermaButton223:SetSize( 150, 30 )				// Set the size
+DermaButton223.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
+DermaButton223.DoClick = function() Derma_Message("+ Added AutoPropkill\n+ Added About Tab\n+ Added Fullbright\n+ Added Killsay/Hurtsay", "Changelog", "OK") end
+
+    local DermaButton2243 = vgui.Create( "DButton", panel5 ) // Create the button and parent it to the frame
+DermaButton2243:SetText( "Astroux's Profile" )					// Set the text on the button
+DermaButton2243:SetPos( 260, 0 )					// Set the position on the frame
+DermaButton2243:SetSize( 150, 30 )				// Set the size
+DermaButton2243.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
+DermaButton2243.DoClick = function() RunConsoleCommand("profile") end
+
 end
+
+
+
 
 
 concommand.Add("Valormenu", main)
