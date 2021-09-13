@@ -455,7 +455,7 @@ end)
    local mat1 = Material("models/shiny")
     hook.Add("PreDrawViewModel", "viewmodelchams", function()
      if GetConVarNumber("EZ_Viewmodelchams") == 1 then
-        render.SuppressEngineLighting(false)
+        render.SuppressEngineLighting(true)
         render.SetColorModulation(1, 0, 1)
         render.MaterialOverride(mat0)
         render.SetBlend(1)
@@ -466,12 +466,12 @@ end)
         render.SetColorModulation(1, 0, 0)
         render.MaterialOverride(Material(""))
         render.SetBlend(1)
-        render.SuppressEngineLighting(false)
+        render.SuppressEngineLighting(true)
     end
  end)   
     hook.Add("PreDrawPlayerHands", "handchams", function()
      if GetConVarNumber("EZ_Handchams") == 1 then
-        render.SuppressEngineLighting(false)
+        render.SuppressEngineLighting(true)
         render.SetColorModulation(1, 0, 1)
         render.MaterialOverride(mat1)
         render.SetBlend(1)
@@ -481,7 +481,7 @@ end)
      if GetConVarNumber("EZ_Handchams") == 1 then
         render.SetColorModulation(1, 0, 0)
         render.MaterialOverride(Material(""))
-        render.SuppressEngineLighting(false)
+        render.SuppressEngineLighting(true)
         render.SetBlend(1)
     end
  end)
@@ -1593,7 +1593,7 @@ surface.PlaySound ("buttons/button14.wav")
 
  local frame = vgui.Create( "DFrame" )
  frame:SetText( "Project Valor" )
- frame:SetSize( 1000, 300 )
+ frame:SetSize( 1000, 400 )
  frame:SetTitle( "Project Valor" )
  frame:Center()
  frame.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
@@ -1925,6 +1925,26 @@ DermaButton22434:SetSize( 150, 30 )				// Set the size
 DermaButton22434.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
 DermaButton22434.DoClick = function() RunConsoleCommand("lenny_ents") end
 
+	local TextEntryPH = vgui.Create( "DTextEntry", panel2 )
+        TextEntryPH:SetSize( 150, 20 )
+	TextEntryPH:SetPlaceholderText( "Colored Chams Red" )
+        TextEntryPH:SetPos( 250, 80 )
+	TextEntryPH.OnEnter = function( self )
+		chamColour.r = self:GetValue()  end 
+        local TextEntryPH2 = vgui.Create( "DTextEntry", panel2 )
+        TextEntryPH2:SetSize( 150, 20 )
+        TextEntryPH2:SetPos( 250, 100 )
+	TextEntryPH2:SetPlaceholderText( "Colored Chams Green" )
+	TextEntryPH2.OnEnter = function( self2 )
+		chamColour.g = self2:GetValue()  end 
+        local TextEntryPH3 = vgui.Create( "DTextEntry", panel2 )
+        TextEntryPH3:SetSize( 150, 20 )
+        TextEntryPH3:SetPos( 250, 120 )
+	TextEntryPH3:SetPlaceholderText( "Colored Chams Blue" )
+	TextEntryPH3.OnEnter = function( self3 )
+		chamColour.b = self3:GetValue()  end 
+
+
 -- Combo box
 local cbox = vgui.Create("DComboBox", panel2)	
 cbox:SetPos(675, 0)
@@ -1940,12 +1960,28 @@ cbox:AddChoice("Chrome", 2)
 cbox:AddChoice("Plasma", 3)
 cbox:AddChoice("Default", 4)
 cbox:AddChoice("Wireframe", 52)
+cbox:AddChoice("Platinum", 6)
+cbox:AddChoice("Alien", 7)
+cbox:AddChoice("Molten", 8)
+cbox:AddChoice("Fire", 9)
+cbox:AddChoice("Glow", 10)
+cbox:AddChoice("Reactor", 11)
+cbox:AddChoice("Water", 12)
+cbox:AddChoice("Water 2", 13)
 
 cbox2:AddChoice("Galaxy", 1)
 cbox2:AddChoice("Chrome", 2)
 cbox2:AddChoice("Plasma", 3)
 cbox2:AddChoice("Default", 4)
 cbox2:AddChoice("Wireframe", 5)
+cbox2:AddChoice("Platinum", 6)
+cbox2:AddChoice("Alien", 7)
+cbox2:AddChoice("Molten", 8)
+cbox2:AddChoice("Fire", 9)
+cbox2:AddChoice("Glow", 10)
+cbox2:AddChoice("Reactor", 11)
+cbox2:AddChoice("Water", 12)
+cbox2:AddChoice("Water 2", 13)
 
 function cbox:OnSelect(index, value, data)
 
@@ -1963,6 +1999,30 @@ function cbox:OnSelect(index, value, data)
         end
         if(data == 52) then				
 		mat1 = Material("models/wireframe")
+        end
+        if(data == 6) then				
+		mat1 = Material("models/player/shared/ice_player")
+        end
+        if(data == 7) then				
+		mat1 = Material("models/XQM/LightLinesRed_tool")
+        end
+        if(data == 8) then				
+		mat1 = Material("models/props_lab/Tank_Glass001")
+        end
+        if(data == 9) then				
+		mat1 = Material("models/shadertest/shader4")
+        end
+        if(data == 10) then				
+		mat1 = Material("Models/effects/splodearc_sheet")
+        end
+        if(data == 11) then				
+		mat1 = Material("Models/effects/comball_tape")
+        end
+        if(data == 12) then				
+		mat1 = Material("models/props_combine/stasisshield_sheet")
+        end
+        if(data == 13) then				
+		mat1 = Material("models/shadertest/shader3")
         end
      end
   
@@ -1983,6 +2043,30 @@ function cbox2:OnSelect(index, value, data)
         end
         if(data == 5) then				
 		mat0 = Material("models/wireframe")
+        end
+        if(data == 6) then				
+		mat0 = Material("models/player/shared/ice_player")
+        end
+        if(data == 7) then				
+		mat0 = Material("models/XQM/LightLinesRed_tool")
+        end
+        if(data == 8) then				
+		mat0 = Material("models/props_lab/Tank_Glass001")
+        end
+        if(data == 9) then				
+		mat0 = Material("models/shadertest/shader4")
+        end
+        if(data == 10) then				
+		mat0 = Material("Models/effects/splodearc_sheet")
+        end
+        if(data == 11) then				
+		mat0 = Material("Models/effects/comball_tape")
+        end
+        if(data == 12) then				
+		mat0 = Material("models/props_combine/stasisshield_sheet")
+        end
+        if(data == 13) then				
+		mat0 = Material("models/shadertest/shader3")
         end
      end
   end
