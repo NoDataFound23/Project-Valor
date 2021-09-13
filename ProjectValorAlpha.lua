@@ -1571,13 +1571,16 @@ CategoryList4:EnableVerticalScrollbar( true )
 
 local function cat()
 
-BGPanel = vgui.Create("DPanel")
-BGPanel:SetPos( 0, 0 )	
-BGPanel:SetSize(400, 400)
-BGPanel:SetBackgroundColor(Color(1, 1, 1, 255))
+ local frames = vgui.Create( "DFrame" )
+ frames:SetText( "Project Valor" )
+ frames:SetSize( 390, 390 )
+ frames:SetTitle( "CATMODE!!!" )
+ frames:Center()
+ frames.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
+ frames:MakePopup()
 		
-local mat = vgui.Create("Material", BGPanel)
-mat:SetPos(5, 5)
+local mat = vgui.Create("Material", frames)
+mat:SetPos(0, 0)
 mat:SetSize(390, 390)
 mat:SetMaterial("cat/cat.png")
 mat.AutoSize = false
@@ -1905,7 +1908,7 @@ DermaButton223:SetText( "Changelog" )					// Set the text on the button
 DermaButton223:SetPos( 130, 0 )					// Set the position on the frame
 DermaButton223:SetSize( 150, 30 )				// Set the size
 DermaButton223.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
-DermaButton223.DoClick = function() Derma_Message("+ Added AutoPropkill\n+ Added About Tab\n+ Added Fullbright\n+ Added Killsay/Hurtsay", "Changelog", "OK") end
+DermaButton223.DoClick = function() Derma_Message("+ Added AutoPropkill\n+ Added About Tab\n+ Added Fullbright\n+ Added Killsay/Hurtsay\n+ Added NoRecoil\n+ Added NoSky", "Changelog", "OK") end
 
     local DermaButton2243 = vgui.Create( "DButton", panel5 ) // Create the button and parent it to the frame
 DermaButton2243:SetText( "Astroux's Profile" )					// Set the text on the button
