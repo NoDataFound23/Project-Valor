@@ -1,8 +1,79 @@
 
+
 CreateClientConVar("_pkill_speed", 100)
 CreateClientConVar("_pkill_prop", "models/props_c17/furnitureStove001a.mdl")
 CreateClientConVar("_pkill_remover", 0.9)
 CreateClientConVar("_weap_lagcomp", 0.1)
+
+local pm = FindMetaTable"Player";
+local cm = FindMetaTable"CUserCmd";
+local function NormalizeAngle(ang)
+	ang.x = math.NormalizeAngle(ang.x);
+	ang.p = math.Clamp(ang.p, -89, 89);
+end
+
+local function Copy(tt, lt)
+	local copy = {}
+	if lt then
+		if type(tt) == "table" then
+			for k,v in next, tt do
+				copy[k] = Copy(k, v)
+			end
+		else
+			copy = lt
+		end
+		return copy
+	end
+	if type(tt) != "table" then
+		copy = tt
+	else
+		for k,v in next, tt do
+			copy[k] = Copy(k, v)
+		end
+	end
+	return copy
+end
+ 
+local surface = Copy(surface);
+local vgui = Copy(vgui);
+local input = Copy(input);
+local Color = Color;
+local ScrW, ScrH = ScrW, ScrH;
+local gui = Copy(gui);
+local math = Copy(math);
+local file = Copy(file);
+local util = Copy(util);
+local vm = FindMetaTable"Vector";
+local me = LocalPlayer();
+local em = FindMetaTable"Entity";
+
+CreateClientConVar("EZ_norecoils", 0)
+
+local function GetAngle(ang)
+	if GetConVarNumber("EZ_norecoils") == 0 then return ang + pm.GetPunchAngle(me); end
+	return ang;
+end
+ 
+local function meme(ucmd)
+ if GetConVarNumber("EZ_norecoils") == 1 then
+	if(!fa) then fa = cm.GetViewAngles(ucmd); end
+	fa = fa + Angle(cm.GetMouseY(ucmd) * .023, cm.GetMouseX(ucmd) * -.023, 0);
+	NormalizeAngle(fa);
+	if(cm.CommandNumber(ucmd) == 0) then
+		cm.SetViewAngles(ucmd, GetAngle(fa));
+		return;
+	end
+
+	if(cm.KeyDown(ucmd, 2) && !em.IsOnGround(me)) then
+		cm.SetButtons(ucmd, bit.band( cm.GetButtons(ucmd), bit.bnot( 2 ) ) );
+	end
+     end
+  end
+ 
+ 
+hook.Add("CreateMove", "funt", function(ucmd)
+	meme(ucmd);
+end);
 
 surface.CreateFont("pcam_font",{font = "Arial", size = 40, weight = 100000, antialias = 0})
 function DrawOutlinedText ( title, font, x, y, color, OUTsize, OUTcolor )
@@ -128,6 +199,49 @@ frame.Paint = function( self, w, h )
    end
 end
 
+local pm = FindMetaTable"Player";
+local cm = FindMetaTable"CUserCmd";
+local function NormalizeAngle(ang)
+	ang.x = math.NormalizeAngle(ang.x);
+	ang.p = math.Clamp(ang.p, -89, 89);
+end
+
+local function Copy(tt, lt)
+	local copy = {}
+	if lt then
+		if type(tt) == "table" then
+			for k,v in next, tt do
+				copy[k] = Copy(k, v)
+			end
+		else
+			copy = lt
+		end
+		return copy
+	end
+	if type(tt) != "table" then
+		copy = tt
+	else
+		for k,v in next, tt do
+			copy[k] = Copy(k, v)
+		end
+	end
+	return copy
+end
+ 
+local surface = Copy(surface);
+local vgui = Copy(vgui);
+local input = Copy(input);
+local Color = Color;
+local ScrW, ScrH = ScrW, ScrH;
+local gui = Copy(gui);
+local math = Copy(math);
+local file = Copy(file);
+local util = Copy(util);
+local vm = FindMetaTable"Vector";
+local me = LocalPlayer();
+local em = FindMetaTable"Entity";
+
+CreateClientConVar("EZ_norecoils", 1)
 
 local ChamMaterials = {
 	["Platinum"] = "models/player/shared/ice_player",
@@ -426,7 +540,7 @@ local function entmenu()
 	local menu = vgui.Create("DFrame")
 	menu:SetSize(500,350)
 	menu:MakePopup()
-	menu:SetTitle("Valor Hack Alpha | ESP Entity Config")
+	menu:SetTitle("Project Valor | ESP Entity Config")
 	menu:Center()
 	menu:SetKeyBoardInputEnabled()
 
@@ -446,7 +560,7 @@ local function entmenu()
 	addent:SetPos(menu:GetWide()/2-25,menu:GetTall()/2-20)
 	addent:SetText("Add")
 menu.Paint = function( self, w, h ) -- 'function menu:Paint( w, h )' works too
-	draw.RoundedBox( 0, 0, 0, w, h, Color( 1, 1, 1, 50 ) ) -- Draw a red box instead of the frame
+	draw.RoundedBox( 0, 0, 0, w, h, Color( 1, 1, 1, 120 ) ) -- Draw a red box instead of the frame
 	addent.DoClick = function() 
 		if noton:GetSelectedLine() != nil then 
 			local ent = noton:GetLine(noton:GetSelectedLine()):GetValue(1)
@@ -1538,7 +1652,7 @@ surface.PlaySound ("buttons/button14.wav")
  SheetItemOne23:SizeToContents()
  
  local SheetItemOne2345 = vgui.Create( "DCheckBoxLabel", panel1)
- SheetItemOne2345:SetText( "Rapidfire" )
+ SheetItemOne2345:SetText( "Auto Pistol" )
  SheetItemOne2345:SetConVar( "lenny_rapidfire" )
  SheetItemOne2345:SetPos( 4, 60 )	
  SheetItemOne2345:SizeToContents()
@@ -1548,6 +1662,12 @@ surface.PlaySound ("buttons/button14.wav")
  SheetItemOne23454:SetConVar( "EZ_Norecoil" )
  SheetItemOne23454:SetPos( 4, 80 )	
  SheetItemOne23454:SizeToContents()
+ 
+  local SheetItemOne234545 = vgui.Create( "DCheckBoxLabel", panel1)
+ SheetItemOne234545:SetText( "Norecoil" )
+ SheetItemOne234545:SetConVar( "EZ_norecoils" )
+ SheetItemOne234545:SetPos( 4, 100 )	
+ SheetItemOne234545:SizeToContents()
 
   
 local SheetItemTwo = vgui.Create( "DCheckBoxLabel" , panel2 )
@@ -1642,7 +1762,7 @@ SheetItemTwo3445563:SizeToContents()
 
     local CategoryContentThreeee322 = vgui.Create( "DCheckBoxLabel", panel3 )
     CategoryContentThreeee322:SetText( "AutoStrafe" )
-    CategoryContentThreeee322:SetConVar( "autostrafer" )
+    CategoryContentThreeee322:SetConVar( "autostrafe" )
     CategoryContentThreeee322:SetPos( 4, 40 )
     CategoryContentThreeee322:SizeToContents()
 
@@ -1668,7 +1788,7 @@ SheetItemTwo3445563:SizeToContents()
 	
         Misccheat5:SetPos( 4, 100 )
 	Misccheat5:SetText( "Name Changer (DarkRP)" )
-	Misccheat5:SetConVar( "shouldchangename" )
+	Misccheat5:SetConVar( "shouldnamechange" )
 	Misccheat5:SizeToContents()
         local Misccheat6 = vgui.Create( "DCheckBoxLabel", panel3 )
         Misccheat6:SetPos( 4, 120 )
@@ -1680,7 +1800,7 @@ SheetItemTwo3445563:SizeToContents()
         Misccheat7:SetPos( 4, 140 )
 
         local Misccheat66 = vgui.Create( "DCheckBoxLabel", panel3 )
-        Misccheat66:SetPos( 250, 120 )
+        Misccheat66:SetPos( 250, 150 )
 
         Misccheat66:SetText( "HurtSay/Killsay" )
 	Misccheat66:SetConVar( "EZ_killsay" )
@@ -1728,7 +1848,7 @@ SheetItemTwo3445563:SizeToContents()
         local CategoryContentSixa234 = vgui.Create( "DNumSlider", panel3 )
     CategoryContentSixa234:SetSize( 150, 60 ) -- Keep the second number at 50
     CategoryContentSixa234:SetText( "Propkill Remove Timer" )
-    CategoryContentSixa234:SetPos( 250, 60 )
+    CategoryContentSixa234:SetPos( 250, 70 )
     CategoryContentSixa234:SetMin( 1 )
     CategoryContentSixa234:SetMax( 10 )
     CategoryContentSixa234:SetDecimals( 0 )
@@ -1737,7 +1857,7 @@ SheetItemTwo3445563:SizeToContents()
             local CategoryContentSixa233 = vgui.Create( "DNumSlider", panel3 )
     CategoryContentSixa233:SetSize( 150, 60 ) -- Keep the second number at 50
     CategoryContentSixa233:SetText( "Propkill Speed" )
-    CategoryContentSixa233:SetPos( 250, 30 )
+    CategoryContentSixa233:SetPos( 250, 100 )
     CategoryContentSixa233:SetMin( 100 )
     CategoryContentSixa233:SetMax( 2000 )
     CategoryContentSixa233:SetDecimals( 0 )
@@ -1779,6 +1899,14 @@ DermaButton2243:SetPos( 260, 0 )					// Set the position on the frame
 DermaButton2243:SetSize( 150, 30 )				// Set the size
 DermaButton2243.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
 DermaButton2243.DoClick = function() RunConsoleCommand("profile") end
+
+
+    local DermaButton22434 = vgui.Create( "DButton", panel2 ) // Create the button and parent it to the frame
+DermaButton22434:SetText( "Box ESP Config" )					// Set the text on the button
+DermaButton22434:SetPos( 250, 40 )					// Set the position on the frame
+DermaButton22434:SetSize( 150, 30 )				// Set the size
+DermaButton22434.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
+DermaButton22434.DoClick = function() RunConsoleCommand("lenny_ents") end
 
 end
 
