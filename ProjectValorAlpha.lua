@@ -310,6 +310,13 @@ CreateClientConVar("lenny_advcrosshair", 0)
 CreateClientConVar("lenny_advcrosshair_money", 0)
 CreateClientConVar("ChatSpam", 0, true, false)
 CreateClientConVar("ChatSpam_DarkRP", 0, true, false)
+CreateClientConVar("EZ_nosky", 0, true, false)
+
+function GAMEMODE:PreDrawSkyBox()  	   
+	if GetConVarNumber("EZ_nosky") == 0 then return; end  	   
+	render.Clear(50, 50, 50, 255);  	   
+	return true;  	   
+end  	   
 
 ply = LocalPlayer()
 
@@ -1209,7 +1216,7 @@ local ply = LocalPlayer()
     if traceRes.HitNonWorld then
         local target = traceRes.Entity
         if target:IsPlayer() then
-            local targethead = target:LookupBone("ValveBiped.Bip01_Spine1")
+            local targethead = target:LookupBone("ValveBiped.Bip01_Head1")
             local targetheadpos,targetheadang = target:GetBonePosition(targethead)
             ply:SetEyeAngles((targetheadpos - ply:GetShootPos()):Angle())
         end
@@ -1550,7 +1557,7 @@ Spam2Messages[3] = "just leave already"
     end
  end
      
-    hook.Add("player_hurt", "", killsay)
+    hook.Add("player_hurt", "1", killsay)
 
 CategoryList3 = vgui.Create( "DPanelList" )                                      
 CategoryList3:SetSpacing( 5 )
@@ -1800,11 +1807,18 @@ SheetItemTwo3445563:SizeToContents()
         Misccheat7:SetPos( 4, 140 )
 
         local Misccheat66 = vgui.Create( "DCheckBoxLabel", panel3 )
-        Misccheat66:SetPos( 250, 150 )
+        Misccheat66:SetPos( 250, 160 )
 
         Misccheat66:SetText( "HurtSay/Killsay" )
 	Misccheat66:SetConVar( "EZ_killsay" )
 	Misccheat66:SizeToContents()
+
+                local Misccheat664 = vgui.Create( "DCheckBoxLabel", panel3 )
+        Misccheat664:SetPos( 250, 180 )
+
+        Misccheat664:SetText( "Disable Skybox" )
+	Misccheat664:SetConVar( "EZ_nosky" )
+	Misccheat664:SizeToContents()
 	
 	Misccheat7:SetText( "Reconnect On Low Health (25 HP)" )
 	Misccheat7:SetConVar( "lowhealthretry" )
