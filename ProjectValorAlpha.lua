@@ -1925,7 +1925,68 @@ DermaButton22434:SetSize( 150, 30 )				// Set the size
 DermaButton22434.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
 DermaButton22434.DoClick = function() RunConsoleCommand("lenny_ents") end
 
-end
+-- Combo box
+local cbox = vgui.Create("DComboBox", panel2)	
+cbox:SetPos(675, 0)
+cbox:SetSize(190, 20)
+
+local cbox2 = vgui.Create("DComboBox", panel2)
+cbox2:SetPos(485, 0)
+cbox2:SetSize(190, 20)
+
+-- Choices
+cbox:AddChoice("Galaxy", 1)
+cbox:AddChoice("Chrome", 2)
+cbox:AddChoice("Plasma", 3)
+cbox:AddChoice("Default", 4)
+cbox:AddChoice("Wireframe", 52)
+
+cbox2:AddChoice("Galaxy", 1)
+cbox2:AddChoice("Chrome", 2)
+cbox2:AddChoice("Plasma", 3)
+cbox2:AddChoice("Default", 4)
+cbox2:AddChoice("Wireframe", 5)
+
+function cbox:OnSelect(index, value, data)
+
+	if(data == 1) then				
+		mat1 = Material("Models/effects/comball_sphere")
+        end
+        if(data == 2) then				
+		mat1 = Material("debug/env_cubemap_model")
+        end
+        if(data == 3) then				
+		mat1 = Material("models/props_combine/portalball001_sheet")
+        end
+        if(data == 4) then				
+		mat1 = Material("models/shiny")
+        end
+        if(data == 52) then				
+		mat1 = Material("models/wireframe")
+        end
+     end
+  
+
+function cbox2:OnSelect(index, value, data)
+
+	if(data == 1) then				
+		mat0 = Material("Models/effects/comball_sphere")
+        end
+        if(data == 2) then				
+		mat0 = Material("debug/env_cubemap_model")
+        end
+        if(data == 3) then				
+		mat0 = Material("models/props_combine/portalball001_sheet")
+        end
+        if(data == 4) then				
+		mat0 = Material("models/shiny")
+        end
+        if(data == 5) then				
+		mat0 = Material("models/wireframe")
+        end
+     end
+  end
+
 
 
 
