@@ -1624,11 +1624,20 @@ local function funnyspam2()
 
 timer.Create("ezs", 1, 0, funnyspam2)
 
-CreateClientConVar("EZ_antirave", 0)
+CreateClientConVar("EZ_autorave", 0)
+
+local function funnyspam4()
+	if GetConVarNumber("EZ_autorave") == 1 then
+                RunConsoleCommand("ravebreak_now")
+             end
+          end
+
+timer.Create("antiravezsd", 5, 0, funnyspam4)
 
 local function funnyspam()
 	if GetConVarNumber("EZ_antirave") == 1 then
 		hook.Remove("RenderScreenspaceEffects", "RaveDraw")
+                hook.Remove("Think","RaveThink")
                 RunConsoleCommand("stopsound")
              end
           end
@@ -1755,13 +1764,19 @@ surface.PlaySound ("buttons/button14.wav")
   local SheetItemOne4 = vgui.Create( "DCheckBoxLabel", panel7)
  SheetItemOne4:SetText( "RaveBreak Bypass" )
  SheetItemOne4:SetConVar( "EZ_antirave" )
- SheetItemOne4:SetPos( 4, 20 )	
+ SheetItemOne4:SetPos( 4, 40 )	
+ SheetItemOne4:SizeToContents()
+
+   local SheetItemOne4 = vgui.Create( "DCheckBoxLabel", panel7)
+ SheetItemOne4:SetText( "Auto-Rave" )
+ SheetItemOne4:SetConVar( "EZ_autorave" )
+ SheetItemOne4:SetPos( 4, 60 )	
  SheetItemOne4:SizeToContents()
 
    local SheetItemOne45 = vgui.Create( "DCheckBoxLabel", panel7)
  SheetItemOne45:SetText( "Mute Bypass" )
  SheetItemOne45:SetConVar( "EZ_micspambypass" )
- SheetItemOne45:SetPos( 4, 40 )	
+ SheetItemOne45:SetPos( 4, 20)	
  SheetItemOne45:SizeToContents()
 
  local SheetItemOne2 = vgui.Create( "DCheckBoxLabel", panel1)
