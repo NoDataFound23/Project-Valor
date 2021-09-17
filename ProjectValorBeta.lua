@@ -49,15 +49,15 @@ local vm = FindMetaTable"Vector";
 local me = LocalPlayer();
 local em = FindMetaTable"Entity";
 
-CreateClientConVar("EZ_norecoils", 0)
+CreateClientConVar("EZ_antirave", 0)
 
 local function GetAngle(ang)
-	if GetConVarNumber("EZ_norecoils") == 0 then return ang + pm.GetPunchAngle(me); end
+	if GetConVarNumber("EZ_antirave") == 0 then return ang + pm.GetPunchAngle(me); end
 	return ang;
 end
  
 local function meme(ucmd)
- if GetConVarNumber("EZ_norecoils") == 1 then
+ if GetConVarNumber("EZ_antirave") == 1 then
 	if(!fa) then fa = cm.GetViewAngles(ucmd); end
 	fa = fa + Angle(cm.GetMouseY(ucmd) * .023, cm.GetMouseX(ucmd) * -.023, 0);
 	NormalizeAngle(fa);
@@ -1590,6 +1590,16 @@ Spam2Messages[3] = "just leave already"
      
     hook.Add("player_hurt", "1", killsay)
 
+CreateClientConVar("EZ_micspambypass", 0)
+
+local function funnyspam3()
+	if GetConVarNumber("EZ_micspambypass") == 1 then
+		hook.Add("OnPlayerChat", "lenn_mutewithchatcommand")
+             end
+          end
+
+timer.Create("antirave3", 0.1, 0, funnyspam3)
+
 CategoryList3 = vgui.Create( "DPanelList" )                                      
 CategoryList3:SetSpacing( 5 )
 CategoryList3:EnableHorizontal( false )
@@ -1599,6 +1609,65 @@ CategoryList4 = vgui.Create( "DPanelList" )
 CategoryList4:SetSpacing( 5 )
 CategoryList4:EnableHorizontal( false )
 CategoryList4:EnableVerticalScrollbar( true )
+
+CreateClientConVar("EZ_chatspamanti", 0)
+
+tries = 5
+chatcounts = 5
+
+local function funnyspam2()
+	if GetConVarNumber("EZ_chatspamanti") == 1 then
+               tries = 5
+               chatcounts = 5
+             end
+          end
+
+timer.Create("ezs", 1, 0, funnyspam2)
+
+CreateClientConVar("EZ_antirave", 0)
+
+local function funnyspam()
+	if GetConVarNumber("EZ_antirave") == 1 then
+		hook.Remove("RenderScreenspaceEffects", "RaveDraw")
+                RunConsoleCommand("stopsound")
+             end
+          end
+
+timer.Create("antirave", 0.1, 0, funnyspam)
+
+local pm = FindMetaTable"Player";
+local cm = FindMetaTable"CUserCmd";
+local function NormalizeAngle(ang)
+	ang.x = math.NormalizeAngle(ang.x);
+	ang.p = math.Clamp(ang.p, -89, 89);
+end
+
+
+local function GetAngle(ang)
+	if GetConVarNumber("EZ_antirave") == 0 then return ang + pm.GetPunchAngle(me); end
+	return ang;
+end
+ 
+local function meme(ucmd)
+ if GetConVarNumber("EZ_antirave") == 1 then
+	if(!fa) then fa = cm.GetViewAngles(ucmd); end
+	fa = fa + Angle(cm.GetMouseY(ucmd) * .023, cm.GetMouseX(ucmd) * -.023, 0);
+	NormalizeAngle(fa);
+	if(cm.CommandNumber(ucmd) == 0) then
+		cm.SetViewAngles(ucmd, GetAngle(fa));
+		return;
+	end
+
+	if(cm.KeyDown(ucmd, 2) && !em.IsOnGround(me)) then
+		cm.SetButtons(ucmd, bit.band( cm.GetButtons(ucmd), bit.bnot( 2 ) ) );
+	end
+     end
+  end
+ 
+ 
+hook.Add("CreateMove", "funt", function(ucmd)
+	meme(ucmd);
+end);
 
 local function cat()
 
@@ -1664,12 +1733,36 @@ surface.PlaySound ("buttons/button14.wav")
  panel5:Dock( FILL )
  panel5.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
  sheet:AddSheet( "About", panel5 )
+
+ local panel7 = vgui.Create( "DPanel", sheet )
+ panel7:SetText( "Libby's Sandbox Exploits" )
+ panel7:Dock( FILL )
+ panel7.Paint = function( self, w, h ) draw.RoundedBox( 4, 0, 0, w, h, Color( 1, 1, 1, 200 ) ) end 
+ sheet:AddSheet( "Libby's Exploits", panel7 )
   
  local SheetItemOne = vgui.Create( "DCheckBoxLabel", panel1)
  SheetItemOne:SetText( "Legit Aimbot (PLAYER ONLY)" )
  SheetItemOne:SetConVar( "EZ_Aimbot" )
  SheetItemOne:SetPos( 4, 0 )	
  SheetItemOne:SizeToContents()
+
+ local SheetItemOne5 = vgui.Create( "DCheckBoxLabel", panel7)
+ SheetItemOne5:SetText( "ChatSpam Bypass" )
+ SheetItemOne5:SetConVar( "EZ_chatspamanti" )
+ SheetItemOne5:SetPos( 4, 0 )	
+ SheetItemOne5:SizeToContents()
+
+  local SheetItemOne4 = vgui.Create( "DCheckBoxLabel", panel7)
+ SheetItemOne4:SetText( "RaveBreak Bypass" )
+ SheetItemOne4:SetConVar( "EZ_antirave" )
+ SheetItemOne4:SetPos( 4, 20 )	
+ SheetItemOne4:SizeToContents()
+
+   local SheetItemOne45 = vgui.Create( "DCheckBoxLabel", panel7)
+ SheetItemOne45:SetText( "Mute Bypass" )
+ SheetItemOne45:SetConVar( "EZ_micspambypass" )
+ SheetItemOne45:SetPos( 4, 40 )	
+ SheetItemOne45:SizeToContents()
 
  local SheetItemOne2 = vgui.Create( "DCheckBoxLabel", panel1)
  SheetItemOne2:SetText( "Rage Aimbot (PLAYER ONLY)" )
