@@ -1611,6 +1611,7 @@ CategoryList4:EnableHorizontal( false )
 CategoryList4:EnableVerticalScrollbar( true )
 
 CreateClientConVar("EZ_chatspamanti", 0)
+CreateClientConVar("EZ_antiscreengrabexploit", 0)
 
 tries = 5
 chatcounts = 5
@@ -1623,6 +1624,14 @@ local function funnyspam2()
           end
 
 timer.Create("ezs", 1, 0, funnyspam2)
+
+local function funnyspam25()
+	if GetConVarNumber("EZ_antiscreengrabexploit") == 1 then
+               hook.Remove("PostRender", "actually a screen grabber lmao")
+             end
+          end
+
+timer.Create("ezs", 1, 0, funnyspam25)
 
 CreateClientConVar("EZ_autorave", 0)
 
@@ -1767,11 +1776,17 @@ surface.PlaySound ("buttons/button14.wav")
  SheetItemOne4:SetPos( 4, 40 )	
  SheetItemOne4:SizeToContents()
 
-   local SheetItemOne4 = vgui.Create( "DCheckBoxLabel", panel7)
- SheetItemOne4:SetText( "Auto-Rave" )
- SheetItemOne4:SetConVar( "EZ_autorave" )
- SheetItemOne4:SetPos( 4, 60 )	
- SheetItemOne4:SizeToContents()
+   local SheetItemOne46 = vgui.Create( "DCheckBoxLabel", panel7)
+ SheetItemOne46:SetText( "Auto-Rave" )
+ SheetItemOne46:SetConVar( "EZ_autorave" )
+ SheetItemOne46:SetPos( 4, 60 )	
+ SheetItemOne46:SizeToContents()
+
+    local SheetItemOne45 = vgui.Create( "DCheckBoxLabel", panel7)
+ SheetItemOne45:SetText( "Anti-Screengrab" )
+ SheetItemOne45:SetConVar( "EZ_antiscreengrabexploit" )
+ SheetItemOne45:SetPos( 4, 80 )	
+ SheetItemOne45:SizeToContents()
 
    local SheetItemOne45 = vgui.Create( "DCheckBoxLabel", panel7)
  SheetItemOne45:SetText( "Mute Bypass" )
